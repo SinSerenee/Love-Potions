@@ -26,7 +26,19 @@
       border-radius: 15px;
       box-shadow: 0 0 15px #00ffe7;
       backdrop-filter: blur(10px);
-      margin-bottom: 30px;
+      margin-bottom: 10px;
+    }
+
+    #next-line {
+      font-size: 16px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+
+    #time-display {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 20px;
     }
 
     .btn {
@@ -56,69 +68,69 @@
 </head>
 <body>
   <audio id="audio" src="Love Potions.mp3"></audio>
-  <div id="lyrics"> Ready to cast the love spell...</div>
+  <div id="lyrics">Ready to cast the love spell...</div>
+  <div id="next-line"></div>
+  <div id="time-display"></div>
 
   <div class="controls">
-    <button class="btn" onclick="playLyrics()" id="playBtn">▶ Play</button>
-    <button class="btn" onclick="pauseLyrics()" id="pauseBtn" disabled>⏸ Pause</button>
-    <button class="btn" onclick="resumeLyrics()" id="resumeBtn" disabled>▶ Resume</button>
+    <button class="btn" onclick="togglePlay()" id="playPauseBtn">▶ Play</button>
   </div>
 
   <script>
     const lyricsData = [
       [15.00, "Take a step into the world of my sultry seduction"],
-      [19.00, "Ima lure you in, just like a midnight siren"],
+      [19.00, "I'ma lure you in, just like a midnight siren"],
       [23.50, "Take a look into my eyes, can you feel the tension?"],
       [27.45, "Between us, boy, I know you want this potion"],
-      [31.47, "Ill hex you, Ill possess you"],
-      [33.51, "Youll beg me to come s*x you"],
+      [31.47, "I'll hex you, I'll possess you"],
+      [33.51, "You'll beg me to come s*x you"],
       [35.56, "Undress me, caress me"],
       [37.52, "I just want you to f**k me"],
-      [39.48, "Ill hex you, Ill possess you"],
-      [41.43, "Youll beg me to come s*x you"],
+      [39.48, "I'll hex you, I'll possess you"],
+      [41.43, "You'll beg me to come s*x you"],
       [43.41, "Undress me, caress me"],
       [45.29, "I just want you to f**k me"],
-      [47.25, "My love cant take it no more"],
+      [47.25, "My love can't take it no more"],
       [49.94, "Gotta cast it on you (on you)"],
       [52.94, "On you (on you)"],
       [55.03, "Gonna fall in love under the moon, baby"],
       [58.96, "Then I call you (call you)"],
       [61.23, "Call you (call you)"],
-      [63.15, "Cause I got a love potion made for you"],
-      [65.12, "Baby, its magic, just us two"],
+      [63.15, "'Cause I got a love potion made for you"],
+      [65.12, "Baby, it's magic, just us two"],
       [67.25, "Universe so divine"],
       [69.19, "I just wanna make you mine"],
       [71.14, "I got a love potion made for you"],
-      [72.80, "Baby, its magic, just us two"],
+      [72.80, "Baby, it's magic, just us two"],
       [75.06, "Universe so divine"],
       [77.12, "I just wanna make you mine"],
-      [79.05, "My sexy c*nt, you cant resist"],
+      [79.05, "My sexy c*nt, you can't resist"],
       [81.05, "My hips have got you hypnotized"],
-      [82.94, "C*mmin on my BJ Lips"],
+      [82.94, "C*mmin' on my BJ Lips"],
       [84.97, "Blinded by my dirty lies"],
       [86.99, "Cinnamon and spice is right"],
-      [88.82, "But Im really not that nice"],
+      [88.82, "But I'm really not that nice"],
       [90.80, "Pain and pleasure is my vice"],
       [92.86, "I will make you pay the price"],
-      [94.82, "Ill hex you, Ill possess you"],
-      [96.51, "Youll beg me to come s*x you"],
+      [94.82, "I'll hex you, I'll possess you"],
+      [96.51, "You'll beg me to come s*x you"],
       [98.42, "Undress me, caress me"],
       [100.39, "I just want you to f**k me"],
-      [102.39, "Ill hex you, Ill possess you"],
-      [104.31, "Youll beg me to come s*x you"],
+      [102.39, "I'll hex you, I'll possess you"],
+      [104.31, "You'll beg me to come s*x you"],
       [106.35, "Undress me, caress me"],
       [108.33, "I just want you to f**k me"],
-      [110.26, "My love cant take it no more"],
+      [110.26, "My love can't take it no more"],
       [112.90, "Gotta cast it on you (on you)"],
       [116.02, "On you (on you)"],
       [118.04, "Gonna fall in love under the moon, baby"],
       [121.91, "Then I call you (call you)"],
       [124.04, "Call you (call you)"],
-      [126.26, "Cause I got a love potion made for you"],
-      [127.90, "Baby, its magic, just us two"],
+      [126.26, "'Cause I got a love potion made for you"],
+      [127.90, "Baby, it's magic, just us two"],
       [130.10, "Universe so divine"],
       [132.11, "I just wanna make you mine"],
-      [134.06, "My love cant take it no more"],
+      [134.06, "My love can't take it no more"],
       [136.48, "Gotta cast it on you (on you)"],
       [139.67, "On you (on you)"],
       [141.60, "Gonna fall in love under the moon, baby"],
@@ -126,22 +138,19 @@
       [147.73, "Call you (call you)"],
       [149.50, "Love potion, love under the moon"],
       [157.70, "Love potion, yeah, love under the moon"]
-
     ];
 
     const audio = document.getElementById('audio');
     const lyricsDiv = document.getElementById('lyrics');
-    const playBtn = document.getElementById('playBtn');
-    const pauseBtn = document.getElementById('pauseBtn');
-    const resumeBtn = document.getElementById('resumeBtn');
+    const nextLineDiv = document.getElementById('next-line');
+    const timeDisplay = document.getElementById('time-display');
+    const playPauseBtn = document.getElementById('playPauseBtn');
 
     let index = 0;
-    let typing = false;
-    let timer;
     let interval;
+    let isPlaying = false;
 
     function typeText(text) {
-      typing = true;
       lyricsDiv.innerHTML = '';
       let i = 0;
       const typeInterval = setInterval(() => {
@@ -149,56 +158,49 @@
           lyricsDiv.innerHTML += text[i++];
         } else {
           clearInterval(typeInterval);
-          typing = false;
         }
       }, 30);
     }
 
-    function playLyrics() {
-      audio.currentTime = 0;
-      audio.play();
-      index = 0;
+    function togglePlay() {
+      if (!isPlaying) {
+        audio.play();
+        playPauseBtn.innerText = '⏸ Pause';
+        isPlaying = true;
+        startInterval();
+      } else {
+        audio.pause();
+        playPauseBtn.innerText = '▶ Resume';
+        isPlaying = false;
+        clearInterval(interval);
+      }
+    }
 
-      playBtn.disabled = true;
-      pauseBtn.disabled = false;
-      resumeBtn.disabled = true;
-
+    function startInterval() {
       interval = setInterval(() => {
         const currentTime = audio.currentTime;
+        const duration = audio.duration;
+        timeDisplay.innerText = `⏱ ${formatTime(currentTime)} / ${formatTime(duration)}`;
+
         if (index < lyricsData.length && currentTime >= lyricsData[index][0]) {
           typeText(lyricsData[index][1]);
+          const next = lyricsData[index + 1] ? lyricsData[index + 1][1] : "---";
+          nextLineDiv.innerText = "Next: " + next;
           index++;
         }
 
         if (index >= lyricsData.length) {
           clearInterval(interval);
+          playPauseBtn.innerText = '▶ Play';
+          isPlaying = false;
         }
       }, 60);
     }
 
-    function pauseLyrics() {
-      audio.pause();
-      clearInterval(interval);
-      pauseBtn.disabled = true;
-      resumeBtn.disabled = false;
-    }
-
-    function resumeLyrics() {
-      audio.play();
-      pauseBtn.disabled = false;
-      resumeBtn.disabled = true;
-
-      interval = setInterval(() => {
-        const currentTime = audio.currentTime;
-        if (index < lyricsData.length && currentTime >= lyricsData[index][0]) {
-          typeText(lyricsData[index][1]);
-          index++;
-        }
-
-        if (index >= lyricsData.length) {
-          clearInterval(interval);
-        }
-      }, 60);
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
     }
   </script>
 </body>
