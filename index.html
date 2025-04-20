@@ -15,7 +15,6 @@
       height: 100vh;
       margin: 0;
     }
-
     #lyrics {
       font-size: 24px;
       text-align: center;
@@ -26,21 +25,8 @@
       border-radius: 15px;
       box-shadow: 0 0 15px #00ffe7;
       backdrop-filter: blur(10px);
-      margin-bottom: 10px;
-    }
-
-    #next-line {
-      font-size: 16px;
-      color: #aaa;
       margin-bottom: 20px;
     }
-
-    #time-display {
-      font-size: 14px;
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-
     .btn {
       margin: 0 10px;
       padding: 12px 25px;
@@ -53,27 +39,47 @@
       transition: 0.3s;
       box-shadow: 0 0 10px #00ffe7;
     }
-
     .btn:hover {
       background: #00b3a1;
       box-shadow: 0 0 20px #00ffe7;
     }
-
     .controls {
       display: flex;
       justify-content: center;
       gap: 20px;
+      flex-wrap: wrap;
+    }
+    #status, #next-line, #time {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+    select {
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: none;
+      background-color: #00ffe7;
+      color: #000;
+      box-shadow: 0 0 10px #00ffe7;
     }
   </style>
 </head>
 <body>
   <audio id="audio" src="Love Potions.mp3"></audio>
-  <div id="lyrics">Ready to cast the love spell...</div>
-  <div id="next-line"></div>
-  <div id="time-display"></div>
-
+  <div id="lyrics"> Ready to cast the love spell...</div>
+  <div id="time">00:00 / 00:00</div>
+  <div id="next-line">Next: —</div>
   <div class="controls">
-    <button class="btn" onclick="togglePlay()" id="playPauseBtn">▶ Play</button>
+    <button class="btn" onclick="togglePlay()" id="playBtn">▶ Play</button>
+    <button class="btn" onclick="restartSong()"> Restart</button>
+    <select onchange="skipToLyric(this.value)">
+      <option value=""> Skip to lyric...</option>
+      <option value="0">Verse 1</option>
+      <option value="4">Chorus 1</option>
+      <option value="20">Verse 2</option>
+      <option value="35">Chorus 2</option>
+    </select>
   </div>
 
   <script>
@@ -142,65 +148,91 @@
 
     const audio = document.getElementById('audio');
     const lyricsDiv = document.getElementById('lyrics');
-    const nextLineDiv = document.getElementById('next-line');
-    const timeDisplay = document.getElementById('time-display');
-    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playBtn = document.getElementById('playBtn');
+    const timeLabel = document.getElementById('time');
+    const nextLine = document.getElementById('next-line');
 
     let index = 0;
-    let interval;
+    let typing = false;
+    let currentTypingInterval = null;
+    let interval = null;
     let isPlaying = false;
 
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
     function typeText(text) {
+      typing = true;
       lyricsDiv.innerHTML = '';
       let i = 0;
-      const typeInterval = setInterval(() => {
+
+      if (currentTypingInterval) clearInterval(currentTypingInterval);
+
+      currentTypingInterval = setInterval(() => {
         if (i < text.length) {
           lyricsDiv.innerHTML += text[i++];
         } else {
-          clearInterval(typeInterval);
+          clearInterval(currentTypingInterval);
+          typing = false;
         }
       }, 30);
     }
 
     function togglePlay() {
       if (!isPlaying) {
-        audio.play();
-        playPauseBtn.innerText = '⏸ Pause';
+        playLyrics();
+        playBtn.textContent = "⏸ Pause";
         isPlaying = true;
-        startInterval();
       } else {
         audio.pause();
-        playPauseBtn.innerText = '▶ Resume';
-        isPlaying = false;
         clearInterval(interval);
+        playBtn.textContent = "▶ Resume";
+        isPlaying = false;
       }
     }
 
-    function startInterval() {
+    function playLyrics() {
+      audio.play();
       interval = setInterval(() => {
         const currentTime = audio.currentTime;
         const duration = audio.duration;
-        timeDisplay.innerText = `⏱ ${formatTime(currentTime)} / ${formatTime(duration)}`;
+        timeLabel.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
 
         if (index < lyricsData.length && currentTime >= lyricsData[index][0]) {
           typeText(lyricsData[index][1]);
-          const next = lyricsData[index + 1] ? lyricsData[index + 1][1] : "---";
-          nextLineDiv.innerText = "Next: " + next;
+          const next = lyricsData[index + 1] ? lyricsData[index + 1][1] : "—";
+          nextLine.textContent = "Next: " + next;
           index++;
         }
 
-        if (index >= lyricsData.length) {
-          clearInterval(interval);
-          playPauseBtn.innerText = '▶ Play';
-          isPlaying = false;
-        }
+        if (index >= lyricsData.length) clearInterval(interval);
       }, 60);
     }
 
-    function formatTime(seconds) {
-      const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-      const s = Math.floor(seconds % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
+    function restartSong() {
+      clearInterval(interval);
+      if (currentTypingInterval) clearInterval(currentTypingInterval);
+      audio.currentTime = 0;
+      lyricsDiv.innerHTML = '';
+      nextLine.textContent = "Next: —";
+      index = 0;
+      isPlaying = false;
+      togglePlay();
+    }
+
+    function skipToLyric(i) {
+      if (i === "") return;
+      i = parseInt(i);
+      clearInterval(interval);
+      if (currentTypingInterval) clearInterval(currentTypingInterval);
+      index = i;
+      audio.currentTime = lyricsData[i][0];
+      lyricsDiv.innerHTML = '';
+      typeText(lyricsData[i][1]);
+      playLyrics();
     }
   </script>
 </body>
