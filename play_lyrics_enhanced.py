@@ -95,13 +95,26 @@ next_lyric_label = tk.Label(window, textvariable=next_lyric_var, font=("Arial", 
 next_lyric_label.pack()
 
 control_frame = tk.Frame(window, bg="black")
-control_frame.pack(pady=10)
+control_frame.pack(pady=10)  # Tambahkan sedikit jarak dari atas
 
 play_button = tk.Button(control_frame, text="▶ Play", font=("Arial", 12), command=start)
 play_button.grid(row=0, column=0, padx=10)
 
 pause_resume_button = tk.Button(control_frame, text="⏸ Pause", font=("Arial", 12), command=toggle_pause)
 pause_resume_button.grid(row=0, column=1, padx=10)
+
+# Frame tombol tambahan tepat di bawah control_frame
+extra_control_frame = tk.Frame(window, bg="black")
+extra_control_frame.pack(pady=10)  # Tidak perlu side="bottom"
+
+resume_button = tk.Button(extra_control_frame, text="▶ Resume", font=("Arial", 12))
+resume_button.grid(row=0, column=0, padx=10)
+
+restart_button = tk.Button(extra_control_frame, text="⏮ Restart", font=("Arial", 12))
+restart_button.grid(row=0, column=1, padx=10)
+
+skip_button = tk.Button(extra_control_frame, text="⏭ Skip to Verse...", font=("Arial", 12))
+skip_button.grid(row=0, column=2, padx=10)
 
 is_paused = [False]
 paused_timestamp = [0]
